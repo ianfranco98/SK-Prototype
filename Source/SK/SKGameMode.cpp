@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "SKGameMode.h"
 #include "SKCharacter.h"
 #include "UObject/ConstructorHelpers.h"
