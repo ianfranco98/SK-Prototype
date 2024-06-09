@@ -23,6 +23,12 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void StartJump(const FInputActionValue& Value);
+
+	void SpeedUp();
+
+	virtual void Landed(const FHitResult& Hit) override;
+
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	UCameraComponent* GetFollowCamera() const { return FollowCamera; }
@@ -59,7 +65,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = SkateMovement)
 	float TurningRate = 2.0f;
 
-	float CurrentAcceleration = 0.0f;
+	UPROPERTY(EditDefaultsOnly, Category = SkateMovement)
+	float AccelerationGainedPerPush = 0.33f;
 
+	UPROPERTY(EditDefaultsOnly, Category = SkateMovement)
+	float DecelerationFactor = 0.15f;
+
+	UPROPERTY(Transient, BlueprintReadOnly)
+	bool bJumpInProgress = false;
+	
+	UPROPERTY(Transient, BlueprintReadOnly)
+	bool bSpeedUpInProgress = false;
+
+	UPROPERTY(Transient, BlueprintReadOnly)
+	bool bWasLanded = false;
+
+	float CurrentAcceleration = 0.0f;
 };
 

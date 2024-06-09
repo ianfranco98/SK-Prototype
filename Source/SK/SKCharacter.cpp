@@ -23,7 +23,7 @@ ASKCharacter::ASKCharacter()
 
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = 1300.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -50,8 +50,7 @@ void ASKCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASKCharacter::StartJump);
 
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASKCharacter::Move);
 
@@ -63,11 +62,14 @@ void ASKCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AddMovementInput(GetActorForwardVector(), CurrentAcceleration);
-
-	CurrentAcceleration -= 0.2f * DeltaTime;
+	if (!bSpeedUpInProgress)
+	{
+		CurrentAcceleration -= DecelerationFactor * DeltaTime;
+	}
 
 	CurrentAcceleration = FMath::Clamp(CurrentAcceleration, 0.0f, 1.0f);
+
+	AddMovementInput(GetActorForwardVector(), CurrentAcceleration);
 }
 
 void ASKCharacter::Move(const FInputActionValue& Value)
@@ -79,7 +81,24 @@ void ASKCharacter::Move(const FInputActionValue& Value)
 
 	if (MovementVector.Y > AccelerationInputThreshold)
 	{
-		CurrentAcceleration = 1.0f;
+		bSpeedUpInProgress = true;
+	}
+}
+
+void ASKCharacter::SpeedUp()
+{
+	CurrentAcceleration += AccelerationGainedPerPush;
+	bSpeedUpInProgress = false;
+}
+
+void ASKCharacter::StartJump(const FInputActionValue& Value)
+{
+	bJumpInProgress = Value.Get<bool>();
+
+	// We want to cancel accel kick if we're jumping.
+	if (bJumpInProgress)
+	{
+		bSpeedUpInProgress = false;
 	}
 }
 
@@ -92,4 +111,18 @@ void ASKCharacter::RotateCamera(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ASKCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	bJumpInProgress = false;
+
+	bWasLanded = true;
+
+	GetWorldTimerManager().SetTimerForNextTick([this]()
+	{
+		bWasLanded = false;
+	});
 }
