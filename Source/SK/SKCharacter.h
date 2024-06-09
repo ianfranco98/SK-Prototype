@@ -71,7 +71,7 @@ protected:
 	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
-	float AccelerationInputThreshold = 0.1f;
+	float AccelerationInputThreshold = 0.6f;
 
 	UPROPERTY(EditDefaultsOnly, Category = SkateMovement)
 	float TurningRate = 2.0f;

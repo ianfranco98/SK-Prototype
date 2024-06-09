@@ -1,13 +1,12 @@
 #include "SKGameMode.h"
-#include "SKCharacter.h"
-#include "UObject/ConstructorHelpers.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/PlayerState.h"
 
-ASKGameMode::ASKGameMode()
+
+void ASKGameMode::OnCharacterJumpOverObstacle(ACharacter* Character)
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+	APlayerState* InstigatorPS = Character->GetPlayerState();
+	const int NewScore = InstigatorPS->GetScore() + PointsPerObstacle;
+	InstigatorPS->SetScore(NewScore);
+	InstigatorPS->OnRep_Score();
 }

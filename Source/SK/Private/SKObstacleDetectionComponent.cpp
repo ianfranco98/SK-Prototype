@@ -1,5 +1,6 @@
 #include "SKObstacleDetectionComponent.h"
 #include "SK/SKCharacter.h"
+#include "SK/SKGameMode.h"
 
 void USKObstacleDetectionComponent::BeginPlay()
 {
@@ -37,6 +38,11 @@ void USKObstacleDetectionComponent::OnEndOverlap(UPrimitiveComponent* Overlapped
 	bool bActorFound = ActorsToCheck.Find(OtherActor) != INDEX_NONE;
 	if (bIsCheckingForObstacles && bActorFound)
 	{
+		if (ASKGameMode* GameMode = Cast<ASKGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			GameMode->OnCharacterJumpOverObstacle(Cast<ACharacter>(GetOwner()));
+		}
+		 
 		ActorsToCheck.Remove(OtherActor);
 		UE_LOG(LogTemp, Warning, TEXT("Actor %s is an obstacle!"), *OtherActor->GetName());
 	}

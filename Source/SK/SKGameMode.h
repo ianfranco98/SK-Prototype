@@ -10,7 +10,13 @@ class ASKGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	ASKGameMode();
+
+	void OnCharacterJumpOverObstacle(ACharacter* Character);
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = GameRules)
+	float PointsPerObstacle = 10.0f;
 };
 
 
