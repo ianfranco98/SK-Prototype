@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "SKObstacleDetectionComponent.h"
 
 ASKCharacter::ASKCharacter()
 {
@@ -36,6 +37,9 @@ ASKCharacter::ASKCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	ObstacleDetectionComponent = CreateDefaultSubobject<USKObstacleDetectionComponent>(TEXT("ObstacleDetectionComponent"));
+	ObstacleDetectionComponent->SetupAttachment(RootComponent);
 }
 
 void ASKCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -70,6 +74,16 @@ void ASKCharacter::Tick(float DeltaTime)
 	CurrentAcceleration = FMath::Clamp(CurrentAcceleration, 0.0f, 1.0f);
 
 	AddMovementInput(GetActorForwardVector(), CurrentAcceleration);
+}
+
+void ASKCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PrevCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PrevCustomMode);
+
+	if (bPressedJump)
+	{
+		OnCharacterIsJumping.Broadcast(true);
+	}
 }
 
 void ASKCharacter::Move(const FInputActionValue& Value)
@@ -125,4 +139,6 @@ void ASKCharacter::Landed(const FHitResult& Hit)
 	{
 		bWasLanded = false;
 	});
+
+	OnCharacterIsJumping.Broadcast(false);
 }

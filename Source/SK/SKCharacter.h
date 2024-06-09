@@ -5,10 +5,14 @@
 #include "Logging/LogMacros.h"
 #include "SKCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FCharacterIsJumping, bool)
+
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class USpringArmComponent;
+
+class USKObstacleDetectionComponent;
 
 struct FInputActionValue;
 
@@ -23,6 +27,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PrevCustomMode) override;
+
 	void StartJump(const FInputActionValue& Value);
 
 	void SpeedUp();
@@ -33,6 +39,8 @@ public:
 
 	UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	FCharacterIsJumping OnCharacterIsJumping;
+
 protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -41,23 +49,26 @@ protected:
 
 	void RotateCamera(const FInputActionValue& Value);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	USpringArmComponent* CameraBoom;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USKObstacleDetectionComponent> ObstacleDetectionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	UCameraComponent* FollowCamera;
+	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	TObjectPtr<UCameraComponent> FollowCamera;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
-	UInputMappingContext* DefaultMappingContext;
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
-	UInputAction* JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
-	UInputAction* MoveAction;
+	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
-	UInputAction* LookAction;
+	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	float AccelerationInputThreshold = 0.1f;
