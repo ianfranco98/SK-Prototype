@@ -1,1 +1,13 @@
-https://github.com/ianfranco98/SK-Prototype/assets/43629439/da81e3e3-6af1-4301-83fb-78f3b116a461
+Implemented features:
+
+- Movement Functionality.
+- Third Person Camera. 
+- Small Designed Level with Jumping obstacles/
+- Jumping.
+- Pushing Functionality.
+- Slow Down Functionality.
+- Points system for every obstacle jumped over.
+- Gamepad support.
+
+https://github.com/ianfranco98/SK-Prototype/assets/43629439/c3a78b95-d6a2-49e3-b1b1-c968584d43ac
+
